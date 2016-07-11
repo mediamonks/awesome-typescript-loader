@@ -110,8 +110,12 @@ async function compiler(webpack: IWebPack, text: string): Promise<void> {
                 let resultText;
                 let resultSourceMap = null;
 
-                if (state.options.declaration) {
-                    // can't use fastEmit with declaration generation
+                // can't use fastEmit with declaration generation
+                // fastEmit gives error when used in webpack using require.context
+                // so first check if the file exists
+                const slowEmit = state.options.declaration || !state.getFile(fileName);
+
+                if (slowEmit) {
 
                     let output = state.emit(fileName);
                     let result = helpers.findResultFor(output, fileName);
